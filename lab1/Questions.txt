@@ -1,0 +1,263 @@
+1. Introduction
+
+The Unix manual:
+contains detailed descriptions of (almost) all available commands
+
+for example, try man ls, or man man
+
+use the arrow keys or j and k to move up and down, <SPACE> to page forward, / to search the page, and q to exit
+
+the manual does not contain entries for shell built in commands; use man sh for these
+
+Other resources
+There are also many resources available online.
+
+The tasks here are divided into two groups, basic tasks and advanced tasks.
+
+Everybody should be able to complete the basic tasks. However, some of the advanced tasks are significantly more difficult, and may involve material that has not been covered in the course.
+
+Here’s a tip…
+If you use bash as your interactive shell, then consider putting something like:
+
+PS1="\${?##0} \$ "
+into your .bashrc file.
+
+PS1 is your primary shell prompt. This little piece of magic includes the exit status of failed commands in your prompt, so you receive visual feedback when something goes wrong.
+
+If you use zsh, then consider putting something like:
+
+PS1="%{%}%m%{%}[%{%}%?%{%}]$ %{%}"
+into your .zshrc file for a similar effect.
+
+2. Basic Tasks
+
+2.1. I/O Redirection
+2.1.1. Task — Hello World
+
+Write a shell script greeting.sh to output the message message Hello World to standard output.
+
+A shell script is simply a text file containing a sequence of shell commands.
+
+Run your script thus:
+
+$ sh greeting.sh
+2.1.2. Task — Create message Hello World in greeting.txt
+
+Use I/O redirection and re-run your script such that its output is redirected to the file greeting.txt.
+
+After running tyour script, you can view the contents of greeting.txt with the command:
+
+$ cat greeting.txt
+2.1.3. Task — Multiple Lines
+
+Write a shell script rhyme.sh which creates a file rhyme.txt containing the following lines:
+
+Mary had a little lamb
+Its fleece was white as snow.
+And everywhere that Mary went
+the lamb was sure to go.
+Your script must involve:
+
+four echo commands and
+
+exactly one I/O redirection operator
+
+Your script may not involve any external commands.
+
+2.1.4. Task — Line Numbers
+
+You should now have a file rhyme.txt.
+
+Use the cat command to output the contents of that file in the format:
+
+     1 Mary had a little lamb
+     2 Its fleece was white as snow.
+     3 And everywhere that Mary went
+     4 the lamb was sure to go.
+Tip
+Read the cat manual page.
+2.1.5. Task — Standard Output and Standard Error
+
+Write a shell script named outerr.sh which outputs the message:
+
+I am standard output
+to standard output, and the message:
+
+I am standard error
+to standard error.
+
+Demonstrate that your script functions correctly:
+
+first by redirecting standard output to /dev/null,
+
+then by redirecting standard error to /dev/null.
+
+2.1.6. Task — script.sh
+
+Write a shell script script.sh which is called as:
+
+$ sh script.sh FILE COMMAND [ARGUMENTS...]
+Your script should run the indicated command (with its arguments, if any) leaving all of its standard and error output in the indicated file.
+
+2.2. The read command
+2.2.1. Task — head.sh
+
+Write a shell script called head.sh which reads three lines of text from standard input and outputs those lines to standard output.
+
+For example, called like this:
+
+$ sh head.sh < rhyme.txt
+its output would be:
+
+Mary had a little lamb
+Its fleece was white as snow.
+And everywhere that Mary went
+Tip
+You may not use any external commands.
+
+You may assume that standard input contains lines of text (it does not contain binary data).
+
+2.3. Pipes
+2.3.1. Task — The grep command
+
+In its most basic form, the grep command:
+
+copies its standard input to its standard output,
+
+but quietly drops lines which do not match a pattern.
+
+Here’s an example:
+
+$ grep false < /etc/passwd
+...
+Here, grep quietly drops lines which do not contain the text false.
+
+Try it for yourself.
+
+2.3.2. Task — The wc command
+
+In the form wc -l, the wc command outputs to its standard output a count of the number of lines found on its standard input.
+
+Here’s an example:
+
+$ wc -l < rhyme.txt
+4
+Try it for yourself.
+
+2.3.3. Task — Count Password lines
+
+Using the grep and wc commands and a pipe:
+
+count the number of lines in the password file (/etc/passwd) containing the text false.
+
+2.3.4. Task — Count HTML Files
+
+The command:
+
+$ find /usr/share/doc -type f -name '*.html'
+outputs a list of all HTML files in or under /usr/share/doc.
+
+How many HTML files are there in or under /usr/share/doc?
+
+2.4. Composition
+2.4.1. The test command
+
+The test command tests a variety of conditions, yielding an exit status of 0 if the condition holds, or a non-zero exit status otherwise.
+
+There’s more information here, and in the relevant manual page (man test).
+
+To get the hang of what’s going on, try the following:
+
+$ test -f /etc/passwd
+$ test -d /etc/passwd
+$ test -s /etc/passwd
+$ test ! -s /etc/passwd
+$ test -d /var
+Tip
+If you include the exit status of the most recent command in your shell prompt, then it’s easier to see what’s going on.
+2.4.2. Task — Report whether a file exists
+
+For this task, you’ll need to know about the positional parameters.
+
+Write a script file_exists.sh which outputs a message indicating whether a file (provided as an argument) exists or not.
+
+Here’s an example:
+
+$ sh file_exists.sh /etc/passwd
+/etc/passwd: does indeed exists
+$
+$ sh file_exists.sh /etc/does-not-exist
+/etc/does-not-exist: does not exist
+Note
+Use the && and || composition operators; do not use an if statement.
+2.4.3. Task — Run command in another directory
+
+Write a script indir.sh which accepts arguments as follows:
+
+$ sh indir.sh DIRECTORY COMMAND [ARGUMENTS..]
+Your script should cd to the indicated DIRECTORY and, if that succeeds, run COMMAND with its ARGUMENTS.
+
+Tip
+You may need to read about positional parameters.
+
+Your solution should not involve and if statement.
+
+A good solution will also use the exec shell built in command; see the shell manual page (man sh).
+
+3. Advanced Tasks
+
+The following tasks are more difficult. Some require an understanding of material which has not been covered in the course.
+
+3.1. I/O Redirection
+3.1.1. Task — script.sh, again
+
+Reconsider script.sh. Extend your script such that, if it is called as follows:
+
+$ sh script.sh FILE -d COMMAND [ARGUMENTS...]
+then it inserts the current date and time (see man date) in the output file before running the command.
+
+For example:
+
+$ sh script.sh FILE -d ls /etc
+might, in the output file, produce:
+
+Mon 10 Nov 06:49:50 GMT 2014
+a2ps.cfg
+a2ps-site.cfg
+acpi
+adduser.conf
+adjtime
+...
+Note
+You may use at most one I/O redirection operator.
+
+3.1.2. Task — Standard Output and Standard Error
+
+Complete this task.
+
+Now, call your script in such a way that:
+
+the message intended for standard output appears on standard error, and
+
+the message intended for standard error appears on standard output.
+
+Here’s an example:
+
+$ sh outerr.sh _ADD_YOUR_MAGIC_HERE_ > /dev/null
+I am standard output
+$
+$ sh outerr.sh _ADD_YOUR_MAGIC_HERE_ 2> /dev/null
+I am standard error
+Where ADD_YOUR_MAGIC_HERE is the same in both cases.
+
+3.2. The read command
+3.2.1. Task — tee.sh
+
+Write a script tee.sh with the basic behaviour of the tee utility:
+
+it copies its standard input to its standard output, additionally leaving a copy of its standard input in a file
+
+Tip
+You may assume that standard input contains lines of text, it does not contain binary data.
+
+You may use a while loop.
