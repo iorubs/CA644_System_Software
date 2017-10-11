@@ -1,0 +1,710 @@
+= CA644 -- Lab Sheet 3 =
+Stephen Blott <stephen.blott@dcu.ie>
+:numbered:
+:toc2:
+:toclevels=4:
+
+// /////////////////////////////////////////////////////
+== Introduction ==
+
+// ****
+// The tasks here are divided into two groups, xref:basic[basic] tasks and
+// xref:advanced[advanced] tasks.
+// 
+// Everybody should be able to complete the basic tasks.  However, some of
+// the advanced tasks are significantly more difficult, and may involve
+// material that has not been covered in the course.
+// ****
+
+****
+The purpose of this week's lab is:
+
+- to gain familiarity with a small number of key Unix utilities
+- to gain experience composing those utilities in order to accomplish
+  more complex tasks
+****
+
+[NOTE]
+====
+Not all of the material required here has been covered in lectures.  You
+may have to consult the relevant manual pages -- sometimes quite carefully.
+====
+
+[NOTE]
+====
+_None of this week's tasks require the use of a shell loop: use pipes._
+====
+
+[TIP]
+====
+If _you_ need a certain behaviour from a utility, it is very likely that
+_somebody else_ has needed that same behaviour previously, and that an option
+or flag is available to obtain the behaviour you need.
+====
+
+// /////////////////////////////////////////////////////
+== The +ls+ Utility ==
+
+****
+The +ls+ utility takes many flags.  Fundamentally, it always lists files
+and directories.  However, it can be made to output listings in quite
+a variety of ways.
+****
+
+// /////////////////////////////////////////////////////
+=== +ls+ and Terminals ===
+
+****
+Try the following:
+
+----
+$ ls
+.
+.
+<copious output>
+$ ls | cat
+.
+.
+<copious output>
+----
+****
+
+****
+The output is different:
+
+- if the output is to a terminal, +ls+ produces multicolumn output
+- if the output is _not_ to a terminal, +ls+ outputs one name per line
+
+When used within a pipeline, _one-name-per-line_ is usually the behaviour you
+want from +ls+, and it's the behaviour you get.  You can also force this
+behaviour with `-1`.
+****
+
+// /////////////////////////////////////////////////////
+=== Listing Directories, Or Directory Contents ===
+
+[NOTE]
+====
+The following assumes that you have directories starting with the letter
++D+ in your home directory.  You are likely to have directories
++Desktop+ and/or +Downloads+ in your home directory.
+====
+
+****
+Try:
+
+----
+$ cd
+$ ls -l D*
+----
+
+Instead of seeing a listing of the directory _names_ which begin
+with the letter +D+, you see a listing of the _contents_ of those
+directories.
+****
+
+****
+Amend the command:
+
+----
+$ ls -l D*
+----
+
+such that you see a listing of only the _names_ of matching directories.
+The output of your new command should be something like:
+
+----
+drwxr-xr-x  23 blott  blott  512 20 Oct 10:59 Desktop
+drwxr-xr-x  23 blott  blott  512 20 Oct 10:59 Downloads
+----
+****
+
+[TIP]
+====
+Read the `ls` manual page.
+====
+
+// /////////////////////////////////////////////////////
+=== Unsorted Listings ===
+
+****
+By default, +ls+ sorts its output in alphanumerical order.
+
+Sorting is costly and, if +ls+ is used in a pipeline, sometimes
+unnecessary.
+****
+
+****
+Devise an +ls+ command which produces unsorted output.
+****
+
+// /////////////////////////////////////////////////////
+=== Dot Files ===
+
+****
+Many user configuration files are stored as "dot files" (files whose name
+starts with the character "+.+") in your home directory.  By default, +ls+
+does not list these files.  Try `ls -l ~/.bashrc`.
+****
+
+****
+How many dot files and directories do you have in your home directory?
+****
+
+[TIP]
+====
+There are a variety of ways to solve this problem, but please use +ls+
+here.
+
+Since you're counting entries, there's no need to sort them.  Be careful not
+to count directory contents.
+
+You may need a pipeline and +wc -l+.
+====
+
+// /////////////////////////////////////////////////////
+== Sorting ==
+
+****
+The +sort+ utility can be used to sort lines in a variety of ways.
+****
+
+
+[NOTE]
+====
+In the following, where +ls+ is used, use +ls -f+ to suppress the sorting
+which +ls+ does by default.
+====
+
+// /////////////////////////////////////////////////////
+=== Sort Files and Directories by Name ===
+
+****
+Use +ls -f+ and a pipe to sort file and directory names alphanumerically.
+****
+
+****
+Use +ls -f+ and a pipe to sort file and directory names into _reverse_
+alphanumerical order.
+****
+
+// /////////////////////////////////////////////////////
+=== Sorting by Size ===
+
+****
+In the output of the +ls -fl+ command, the fifth column is the size of the
+listed item.
+****
+
+****
+Use +ls -fl+ and a pipe to output a long listing of the current directory's
+contents sorted by size.
+****
+
+****
+Use +ls -fl+ and a pipe to output a long listing of the current directory's
+contents sorted by size, but from largest to smallest.
+****
+
+[TIP]
+====
+Check the +-k+ option to +sort+.  But you'll need another option too.
+====
+
+// /////////////////////////////////////////////////////
+=== Your Largest Regular File ===
+
+// ****
+// Devise a pipeline involving +find+, +du -s+ and +sort+ to find the largest
+// regular file in or under your home directory.
+// ****
+// 
+// [TIP]
+// ====
+// While you're testing this, you may want to use a directory other than your
+// home directory; your home directory probably contains rather a lot of
+// files.
+// ====
+
+****
+Devise another pipeline involving +find+, +xargs+, +du -s+ and +sort+ to find
+the largest regular file in or under your home directory.
+****
+
+// [NOTE]
+// ====
+// Your solution with +xargs+ is likely better than your solution without.
+// Why?
+// ====
+
+// /////////////////////////////////////////////////////
+=== Sorting Tail of File Name ===
+
+****
+The command:
+
+----
+$ find /usr/bin /usr/sbin -type f -maxdepth 1 | sort
+----
+
+sorts all of the files in +/usr/bin+ before all of the files in
++/usr/sbin+.
+****
+
+****
+Add options to the +sort+ command such that files are sorted
+_only by the file name component_.
+
+So, +/usr/sbin/zdump+ sorts before +/usr/bin/zegrep+ because +zdump+ sorts
+alphanumerically before +zegrep+.
+****
+
+// /////////////////////////////////////////////////////
+== The +uniq+ Utility ==
+
+****
+The +uniq+ utility filters out adjacent repeated lines.
+
+With the +-c+ flag, +uniq+ reports a count of the number of times a line is
+repeated.
+****
+
+****
+Here's an example:
+
+----
+$ { seq 4; seq 7; } | sort | uniq -c
+   2 1
+   2 2
+   2 3
+   2 4
+   1 5
+   1 6
+   1 7
+----
+
+Here, the leading +2+ and +1+ counts are added by +uniq -c+ to indicate how
+many times each line was repeated.
+****
+
+// /////////////////////////////////////////////////////
+=== How Many Processes? ===
+
+****
+The command:
+
+----
+$ ps -aux
+----
+
+outputs a long listing of all running processes.
+****
+
+****
+The command:
+
+----
+$ ps aux | cut -d' ' -f 1
+----
+
+outputs just the user names of the owners of all running processes.
+****
+
+****
+Extend the command above to count the number of processes being run by each
+user.
+
+Your output might look something like:
+
+----
+     21 blott
+      2 postfix
+    100 root
+      3 syslog
+.
+.
+.
+----
+****
+
+// /////////////////////////////////////////////////////
+=== How Many Processes? -- Sorted ===
+
+****
+Repeat the task above, this time with your output sorted into increasing
+order of the number of processes owned by each user.
+
+Your output might look something like:
+
+----
+.
+.
+.
+      2 postfix
+      3 syslog
+     21 blott
+    100 root
+----
+****
+
+[TIP]
+====
+This paradigm of sorting and using +uniq -c+ is common for finding the most
+(or fewest) of something.
+====
+
+// /////////////////////////////////////////////////////
+== The +tr+ Utility ==
+
+****
+The +tr+ utility translates and elides characters and character classes.
+****
+
+// /////////////////////////////////////////////////////
+=== Lower Case ===
+
+****
+Write a shell script which copies its standard input to its standard
+output, replacing all lower case characters with their upper case
+counterparts.
+****
+
+// /////////////////////////////////////////////////////
+=== Components of a File Name ===
+
+****
+Write a shell script +components.sh+ which accepts a file name as an argument and outputs
+the name of each directory on the path from the root to the file itself
+(each on a new line), followed by the file name itself.
+****
+
+****
+Here's an example:
+
+----
+$ cd
+$ sh components.sh .zshrc
+usr
+home
+blott
+.zshrc
+----
+****
+
+[TIP]
+====
+You will need to use +readlink+.
+
+The little piece of magic +tail +2+ might be useful for getting rid of
+a leading empty line.
+====
+
+****
+Write another shell script +uncomponents.sh+ which performs the opposite
+function:
+
+- it reads a list of components each on their own line and outputs the
+  corresponding full path of the file.
+****
+
+****
+Here's an example:
+
+----
+$ cd
+$ sh components.sh .zshrc | sh uncomponents.sh
+/usr/home/blott/.zshrc
+----
+****
+
+// /////////////////////////////////////////////////////
+=== Another Caesar Cypher ===
+
+****
+Here's a code fragment I ran earlier:
+
+----
+$ echo XXXXX XXXXX | tr 'a-z' 's-za-r'
+zwddg lzwjw
+----
+
+Here, I've redacted the original message with +X+ characters.
+****
+
+****
+What was the original message?
+****
+
+// /////////////////////////////////////////////////////
+=== Cleaning Up Formatted Output ===
+
+****
+The command +ls -l+ produces formatted output:  additional whitespace is
+added to ensure that columns line up.  The command +ps -aux+ behaves
+similarly.
+****
+
+****
+Pipe the output of +ls -l+ through a suitable +tr+ command such that, on
+each line, exactly one space character separates each field.
+
+Your output may look something like:
+
+----
+-rw-r--r-- 1 blott blott 19082 12 Nov 10:56 01-intro.slidy
+-rw-r--r-- 1 blott blott 551 12 Nov 11:02 02-more-xargs.slidy
+-rw-r--r-- 1 blott blott 287767 12 Nov 10:59 02-more.slidy
+-rw-r--r-- 1 blott blott 15953 17 Nov 06:36 03-utils.slidy
+----
+
+Notice, in particular, that the columns no longer line up.
+****
+
+[TIP]
+====
+Why might you want to do such a thing?
+
+Having columns line up is nice visually, but not always so great for data
+processing.
+
+For example, after reformatting, you are guaranteed that the character following the
+eighth space is the beginning of the file name.
+====
+
+// /////////////////////////////////////////////////////
+=== Replacing Characters ===
+
+****
+First, put a list of all of the files in or under your home directory in
+a temporary file:
+
+----
+$ find ~ -type f > ~/files.txt
+----
+****
+
+****
+Now, without using +find+ again, output a list containing the size of each
+file in or under your home directory.
+****
+
+****
+Your output might look something like:
+
+----
+4       /usr/home/blott/.cshrc
+4       /usr/home/blott/.login
+8       /usr/home/blott/.mailrc
+4       /usr/home/blott/.profile
+4       /usr/home/blott/.shrc
+8       /usr/home/blott/.mail_aliases
+12      /usr/home/blott/.rhosts
+4       /usr/home/blott/.ssh/id_rsa
+4       /usr/home/blott/.ssh/id_rsa.pub
+.
+.
+.
+----
+****
+
+[NOTE]
+====
+. You must read the list of files from +files.txt+
+. Your solution must accomodate files whose names contain whitespace characters.
+. You may not use a shell loop.
+====
+
+[TIP]
+====
+You should use +xargs+. In fact, you should use +xargs -0+.  However, the
+files in +files.txt+ are separated by newline characters.  You need them
+separated by null (+\0+) characters.
+====
+
+// /////////////////////////////////////////////////////
+=== Counting Words ===
+
+****
+Download the
+link:labsheet-03-utils.ascii[asciidoc source]
+for this document.
+
+(Try right-clicking on the link and selecting something like _save link
+as_.)
+****
+
+****
+Taking a _word_ to be any sequence of alphabetic characters (that is,
++a-z+ and +A-Z+):
+
+- how many words are there in this document?
+- what are the most commonly occurring words?
+****
+
+****
+Taking a _number_ to be any sequence of numeric digits:
+
+- how many numbers are there in this document?
+- what are the most commonly occurring numbers?
+****
+
+// /////////////////////////////////////////////////////
+== The +grep+ Utility ==
+
+****
+The following tasks involve the +grep+ utility:
+
+[source, sh]
+----
+grep [OPTIONS] PATTERN [FILE...]
+----
+
+The +grep+ utility searches files or its standard input for lines matching
+patterns.
+****
+
+****
+Here are the basics of +grep+ patterns:
+
+- most characters match themselves, so +grep foo+ matches lines containing the indicated sequence of
+   characters
+- the character +.+ (a dot) matches _any_ character except the newline
+  character
+- a character class of the form +[X-Y]+ matches all characters between
+  +X+ and +Y+; +
+  for example, +grep \'[0-9]'+ matches all lines containing
+  a digit
+- the special patterns +\<+ and +\>+ match the beginning (or end) of
+  a word, +
+  so +grep \'\<f'+ matches all lines containing a word beginning
+  with the character +f+.
+****
+
+****
++grep+ patterns may also include _repetition operators_.  Here are some
+examples:
+
+[source, sh]
+----
+grep 'ab*'          # match an a followed by zero or more b characters
+grep 'ab?'          # match an a followed by zero or one b characters
+grep 'ab{3,}'       # match an a followed by three or more b characters
+grep 'ab{99}'       # match an a followed by exactly 99 b characters
+grep 'ab{90,99}'    # match an a followed by between 90 and 99 b characters
+----
+****
+
+// /////////////////////////////////////////////////////
+=== Finding Words ===
+
+****
+Find all lines in +labsheet-03-utils.ascii+ containing the character
+sequence "+sort+" (without quotes).
+****
+
+****
+Find all lines in +labsheet-03-utils.ascii+ containing the
+_word_ "+sort+".
+
+You should not match this line, because it contains the word +sorting+,
+which is a different word.
+****
+
+[TIP]
+====
+Try using +\<+ and +\>+.
+====
+
+****
+Find all lines in +labsheet-03-utils.ascii+ containing vowels.
+****
+
+// /////////////////////////////////////////////////////
+=== Finding Numbers ===
+
+****
+Find all lines in +labsheet-03-utils.ascii+ containing numbers (that is,
+the digits +0+ though +9+).
+****
+
+****
+Find all lines in +labsheet-03-utils.ascii+ containing a sequence of at least
+two digits.
+****
+
+****
+Find all lines in +labsheet-03-utils.ascii+ containing a sequence of
+exactly three digits.
+****
+
+[TIP]
+====
+There are (at least) two ways to do this.  Either use the special +\<+ and
++\>+ patterns for matching the start/end of words, or use the
++-w+ flag to +grep+.
+====
+
+****
+Find all lines in +labsheet-03-utils.ascii+ containing a sequence of at
+exactly three digits.  Output only the matching number.
+****
+
+[TIP]
+====
+See the +-o+ flag to +grep+.
+====
+
+****
+What is the most commonly occurring two-digit number in
++labsheet-03-utils.ascii+?
+****
+
+// /////////////////////////////////////////////////////
+=== A Little More Complicated ===
+
+****
+This link:labsheet-03-utils.ascii[file] contains many occurrences of words
+with the stem +sort+: +Sort+, +sorted+, +sorting+, etc.  Note that some of
+them are capitalised.
+****
+
+****
+How many instances of such words are there in this file?
+****
+
+****
+How many occurrences of each such word are there?
+
+That is, you should consider +sorting+ and +Sorting+ to be the same word,
+but +sorted+ to be different.
+****
+
+// /////////////////////////////////////////////////////
+== Advanced ==
+
+****
+Write a shell script to hard-link together duplicate copies of the same
+file.
+****
+
+****
+Files are duplicates if:
+
+- they are within the same file system
+- they have different inode numbers
+- they are of the same size, with the same owner, group and permissions
+- they have the same +md5sum+ hash values
+
+Additionally, empty should _not_ be considered
+duplicates.
+****
+
+[TIP]
+====
+You may use shell loops for this task, however you should avoid doing so
+wherever possible.
+
+Do not calculate +md5sum+ hash values for files which cannot possibly be
+duplicates.
+====
+
