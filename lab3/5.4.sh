@@ -1,3 +1,3 @@
 #!/bin/sh
 
-ls -l | tr -s ' '
+    ls -l | tr -s ' '
