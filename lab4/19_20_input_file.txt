@@ -1,0 +1,23 @@
+#!/bin/sh
+
+something()
+{
+   echo hello
+}
+
+# existing comment, nothing added here
+something ()
+{
+   echo hello
+}
+
+something ()
+{
+   echo hello
+}
+
+# existing comment, nothing added here
+something ()
+{
+   echo hello
+}

@@ -1,0 +1,433 @@
+1. Introduction
+
+The following tasks all involve the use of sed.
+
+If you google sed cheat sheet you’ll find many helpful resources.
+
+There are more tasks here than most people will be able to complete in during the lab. If you do fail to complete them during the lab, please do complete them independently.
+
+2. sed Scripts
+
+Rather than working with sed commands on the command line, you may find it more convenient to work with sed scripts. That way:
+
+you can lay your sed commands out in a way that better reflects their structure, and
+
+you’ll have a copy of your work should you want to refer back to it in the future.
+
+A sed script is just a file whose contents are sed commands. Here’s and example (don’t worry too much about what it does, the important thing is just that it’s formatted in a way that makes it easier to see the structure):
+
+#!/bin/sed -rf
+
+/^\w+\s*\(\)/ {
+   x
+   /^\s*#/! {
+      s/.*/# #################################/
+      p
+   }
+   x
+}
+
+h
+If you make such a file executable, you can run it from the command line just as you would a shell script:
+
+$ chmod u+x some_file.sed
+$ ./some_file.sed < some_other_file.txt
+Tip
+Use the suffix .sed for sed scripts. That way your editor is likely to enable appropriate syntax highlighting.
+
+3. Past Tense
+
+Write a sed invocation which converts any word ending with the suffix ing to end instead with the suffix ed.
+
+Example:
+echo "walking ringer talking" | sed ...
+# outputs walked ringer talked
+Tip
+With extended regular expressions (using the -r option), \< and \> match the zero-length text at the start/end of a word.
+
+4. Add Parentheses
+
+Write a sed invocation to put parentheses around the first word on each line.
+
+Example:
+echo "hello there" | sed ...
+# outputs (hello) there
+Tip
+With extended regular expressions (-r), \w matches any valid word character.
+
+5. Swap Digits
+
+Write a sed invocation to swap the order of the digits of all two-digit numbers on every line.
+
+Example:
+echo "12 123 45 6" | sed ...
+# outputs 21 123 54 6
+Tip
+Use [0-9] to match a digit.
+
+6. Append Comment
+
+Write a sed invocation to append the text " # comment" to each line.
+
+Example:
+echo "12 123 45 6" | sed ...
+# outputs 12 123 45 6 # comment
+7. Append Comment Line
+
+Write a sed invocation to append the contents of each line as a comment to the end of the line itself.
+
+Comments should not be added to the end of lines which contain only whitespace.
+
+Example:
+echo "12 123 45 6" | sed ...
+# outputs 12 123 45 6 # 12 123 45 6
+#
+echo "   " | sed ...
+# outputs only the original whitespace
+8. Odd Numbers Containing an Even Digit
+
+Write a sed invocation which outputs only lines which contain odd numbers which themselves contain an even digit.
+
+You may assume that each line only contains a number.
+
+Example:
+seq 1000 | sed ...
+Output ends with:
+.
+.
+.
+963
+965
+967
+969
+981
+983
+985
+987
+989
+9. Same Start and End Digits
+
+Write sed invocation which reads lines containing numbers, outputting only those lines in which the first and last digits are the same.
+
+Example:
+seq 1000 | sed ...
+Outputs:
+11
+22
+33
+44
+55
+66
+77
+88
+99
+101
+111
+121
+.
+.
+.
+979
+989
+999
+Tip
+Use an address of the form /RE/ to select exactly the lines you want.
+
+You can use a back reference such as \1 within such an address.
+
+10. Repeated Digits
+
+Write a sed invocation to output only lines containing only numbers consisting of a repeated single digit (and containing at least two digits).
+
+Example:
+seq 1000 | sed ...
+For which the output is:
+11
+22
+33
+44
+55
+66
+77
+88
+99
+111
+222
+333
+444
+555
+666
+777
+888
+999
+11. Absolute Value
+
+Write in invocation of sed which copies its standard input to its standard output replacing all negative numbers to their corresponding positive numbers.
+
+Example:
+echo "-32 45 -45 -72" | sed ...
+# outputs 32 45 45 72
+12. Leading Lines (head)
+
+Write a shell script head.sh which:
+
+copies its standard input to its standard output
+
+accepts either no or one arguments
+
+if no argument is provided, head.sh should copy only the first 10 lines (like head)
+
+if one argument is provided, it should be of the form -n where n is a number; head.sh should copy only the first n lines (again, like head)
+
+Examples:
+# output just the first 10 numbers
+seq 2147483647 | sh head.sh
+
+# output just the first 100 numbers
+seq 2147483647 | sh head.sh -100
+Note
+You should, of course, use sed.
+
+There are a number of ways to process the argument (should one be provided). However, your solution to the preceding task (Absolute Value) may prove useful.
+
+13. Comparing Files
+
+Note
+Advanced.
+
+Consider the following shell fragment:
+
+sh -c 'cmp -s "$1" "$2" || echo "$1"' -- FILE1 FILE2
+It must be applied to exactly two files ( FILE1 and FILE2 here, which must exist). If the contents of the two files are identical, then it outputs nothing. If the contents of the two files differ, then it outputs the name of the first file.
+
+You’ll need this fragment below.
+
+Assume you have some directory hierarchy containing C source files (all of whose names end with the suffix .c).
+
+Assume also that, for every such source file, a corresponding file with the additional suffix .orig exists.
+
+For example, if the following file exists:
+
+src/main/winsize.c
+Then so too does:
+
+src/main/winsize.c.orig
+There’s an example of such a directory in this tar archive. Use the following command to unpack it:
+
+tar zxvf sys.bin.sh.tgz
+Write a shell pipeline which outputs the names of all C files whose contents differ from the corresponding .orig file.
+
+You may not use a shell loop.
+
+Use the tar archive mentioned above to test your solution. There are two files in that archive for which the .c file differs from the .orig file.
+
+Tip
+Here are the ingredients to use:
+
+use find to list the relevant C files
+
+use sed to add the .orig files to the list (so the list will alternate between a .c file and its corresponding .orig file)
+
+use xargs and the shell fragment given above to compare the files
+
+Recall that the shell fragment given above expects exactly two arguments. The -n option to xargs may prove helpful.
+
+14. Stripping Comments
+
+Assume some programming language in which comments may be enclosed within /* and */ markers (much like C, or Java).
+
+Further assume that such markers must occur on lines by themselves (unlike C, or Java).
+
+Write a script to strip such comments.
+
+Example input:
+1
+2
+/*
+3
+*/
+4
+5
+/*
+6
+7
+8
+*/
+9
+Example output:
+1
+2
+4
+5
+9
+Tip
+Recall the feature of sed addressing whereby, if two addresses are provided, then the function is applied only between lines matching the first and the second address (inclusive).
+
+15. Network Addresses
+
+Write a shell script addresses.sh which outputs the IP addresses of all interfaces on the current system.
+
+Include only IPv4 addresses.
+
+On my laptop, the output is:
+
+192.168.4.69
+127.0.0.1
+Tip
+The command /sbin/ifconfig outputs information about network interfaces. Pipe the output of this command through a sed invocation to extract the required information.
+
+16. Default Router
+
+Write a shell script which succeeds if it can ping the default router and fails otherwise.
+
+Tip
+You will first have to obtain the IP address of the default router. Use sed to parse the output of netstate -nr. The default router is the route to address 0.0.0.0.
+
+You will need to use the ping command. You only need to send/receive one packet. There’s a ping option to arrange that. You may assume that the router would respond within one second, so set the timeout to one second. There’s another ping option to set such a timeout.
+
+17. Overloaded
+
+Note
+Advanced.
+
+Write a shell script which outputs a message to standard output once a second if your system appears overloaded.
+
+Your system should be considered overloaded if its load average is 1.00 or more.
+
+The uptime utility reports, amongst other things, the current load average. It’s the first of the three load averages reported. You should parse this output with sed.
+
+To test your script, you’ll have to generate load.
+
+The following starts a background job which should consume quite a few CPU cycles:
+
+while true; do echo hello; done | md5sum - &
+Start a couple of those jobs.
+
+You can kill jobs off again with kill %1, kill %2, etc.
+
+Tip
+You will also need a while loop, sleeping for a second then checking the current load average.
+
+18. Swap Lines
+
+Write a sed invocation to swap adjacent lines. Output first the second line, then the first, then the fourth, then the third, etc.
+
+Example:
+seq 10 | sed ...
+2
+1
+4
+3
+6
+5
+8
+7
+10
+9
+Tip
+You may assume that there are an even number of lines.
+
+You will need to use the hold buffer. You will probably have to use the n command to read the next line too.
+
+19. Add Comments
+
+Note
+Advanced.
+
+Write a sed script to add comment lines before every function definition within a shell script.
+
+You should assume that the initial line of a function definition is of the form:
+
+start of line
+
+the function name (without any leading white space)
+
+optional whitespace
+
+the characters ()
+
+If the line preceding a function definition already contains a comment, your script should make no change.
+
+If the line preceding a function definition does not contain a comment, your script should add a comment of the form:
+
+# -------------------------------------------------------
+# function:
+Here’s some example input:
+
+#!/bin/sh
+
+something()
+{
+   echo hello
+}
+
+# existing comment, nothing added here
+something ()
+{
+   echo hello
+}
+
+something ()
+{
+   echo hello
+}
+
+# existing comment, nothing added here
+something ()
+{
+   echo hello
+}
+And here’s the corresponding output:
+
+#!/bin/sh
+
+# -------------------------------------------------------
+# function:
+something()
+{
+   echo hello
+}
+
+# existing comment, nothing added here
+something ()
+{
+   echo hello
+}
+
+# -------------------------------------------------------
+# function:
+something ()
+{
+   echo hello
+}
+
+# existing comment, nothing added here
+something ()
+{
+   echo hello
+}
+Tip
+You will have to use the hold space.
+
+20. Include the function name …
+
+Note
+Advanced.
+
+Repeat the task above (Add Comments). Now, however, include the name of the function being defined in the comment itself.
+
+Example output:
+# -------------------------------------------------------
+# function: something
+something ()
+{
+   echo hello
+}
+
+# -------------------------------------------------------
+# function: somethingElse
+somethingElse ()
+{
+   echo hello
+}
+
